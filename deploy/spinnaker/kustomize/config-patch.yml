@@ -1,0 +1,16 @@
+apiVersion: spinnaker.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+spec:
+  # spec.spinnakerConfig - This section is how to specify configuration spinnaker
+  spinnakerConfig:
+  # spec.spinnakerConfig.config - This section contains the contents of a deployment found in a halconfig .deploymentConfigurations[0]
+    config:
+      version: 1.17.1  # the version of Spinnaker to be deployed
+      persistentStorage:
+        persistentStoreType: azs
+        azs:
+          storageAccountName: myqvcspinnakertest
+          storageAccountKey: 3D3EElnMKRc/YwcCB0iTGei07JnThESl0dbY1YT8EIwBQjfDQ1UNS6t7DubdLx/N9111AQYxPUZda8A2Tev4dg==
+          storageContainerName: spinnaker
