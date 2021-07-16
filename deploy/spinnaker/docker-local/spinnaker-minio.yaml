@@ -76,16 +76,10 @@ metadata:
   name: spinnaker
   namespace: spinnaker-operator
 spec:
-  expose: {}
-  kustomize:
-    clouddriver: {}
-    deck: {}
-    echo: {}
-    front50: {}
-    gate: {}
-    igor: {}
-    orca: {}
-    rosco: {}
+  expose:
+    type: service  # Kubernetes LoadBalancer type (service/ingress), note: only "service" is supported for now
+    service:
+      type: LoadBalancer
   spinnakerConfig:
     config:
       artifacts: {}
@@ -95,13 +89,22 @@ spec:
       features: {}
       metricStores: {}
       notifications: {}
-      persistentStorage: {}
+      persistentStorage:
+        persistentStoreType: s3
+        s3:
+          accessKeyId: minio
+          bucket: spinnaker
+          endpoint: http://minio:9000
+          pathStyleAccess: true
+          region: us-west-2
+          rootFolder: front50
+          secretAccessKey: encrypted:k8s!n:spin-secrets!k:minioAccessKey 
       providers: {}
       pubsub: {}
       repository: {}
       security: {}
       spinnaker: {}
-      version: 2.21.0
+      version: 1.17.1
     profiles:
       clouddriver: {}
       echo: {}

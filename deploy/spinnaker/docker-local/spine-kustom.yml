@@ -1,0 +1,189 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: spinnaker-operator
+spec:
+  ports:
+  - port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app: minio
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: minio
+  name: minio-pvc
+  namespace: spinnaker-operator
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  namespace: spinnaker-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  serviceName: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - command:
+        - /bin/sh
+        - -c
+        - mkdir -p /storage/spinnaker && /usr/bin/minio server /storage
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: minio
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: minioAccessKey
+              name: spin-secrets
+        image: minio/minio
+        name: minio
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - mountPath: /storage
+          name: storage
+      securityContext:
+        fsGroup: 65535
+        runAsGroup: 65535
+        runAsUser: 1000
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: minio-pvc
+---
+apiVersion: spinnaker.io/v1alpha2
+kind: SpinnakerService
+metadata:
+  name: spinnaker
+  namespace: spinnaker-operator
+spec:
+  expose:
+    type: service  # Kubernetes LoadBalancer type (service/ingress), note: only "service" is supported for now
+    service:
+      type: LoadBalancer
+  spinnakerConfig:
+    config:
+      artifacts: {}
+      canary: {}
+      ci: {}
+      deploymentEnvironment: {}
+      features: {}
+      metricStores: {}
+      notifications: {}
+      persistentStorage:
+        persistentStoreType: s3
+        s3:
+          accessKeyId: minio
+          bucket: spinnaker
+          endpoint: http://minio:9000
+          pathStyleAccess: true
+          region: us-west-2
+          rootFolder: front50
+          secretAccessKey: encrypted:k8s!n:spin-secrets!k:minioAccessKey
+      providers: {}
+      pubsub: {}
+      repository: {}
+      spinnaker: {}
+      version: 1.17.1
+      security:
+        authz:
+          enabled: true
+          groupMembership:
+            file:
+              path: rolemappings.yml
+              roleProviderType: FILE
+            service: FILE
+    files:
+      rolemappings.yml: |
+        #-----------------------------------------------------------------------------------------------------------------
+        # Example file mapping usernames to roles (groups).
+        # User names come from an external system configured as an authn provider.
+        # Roles don’t need to be defined elsewhere, they’re automatically created based on these mappings.
+        #-----------------------------------------------------------------------------------------------------------------
+        users:
+        - username: foo
+          roles:
+          - bar
+          - baz
+        - username: batman
+          roles:
+          - group-b-spingo
+          - role1
+        - username: robin
+          roles:
+          - role2
+    profiles:
+      clouddriver: {}
+      echo: {}
+      fiat:
+        auth:
+          permissions:
+            provider:
+              application: aggregate
+            source:
+              application:
+                prefix:
+                  enabled: true
+                  prefixes:
+                  - permissions:
+                      CREATE:
+                      - spinnaker-admins
+                      - role1
+                      EXECUTE:
+                      - role1
+                      READ:
+                      - spinnaker-admins
+                      - role2
+                      - role1
+                      WRITE:
+                      - role1
+                    prefix: '*'
+      front50: {}
+      gate:
+        security.basicform.enabled: true
+        server:
+          tomcat:
+            httpsServerPort: X-Forwarded-Port
+            internalProxies: .*
+            protocolHeader: X-Forwarded-Proto
+            remoteIpHeader: X-Forwarded-For
+        spring:
+          security:
+            user:
+              name: batman
+              password: encrypted:k8s!n:spin-secrets!k:http-password
+      igor: {}
+      orca: {}
+      rosco: {}
+      settings-local.js: {}
+      spinnaker: {}
+      spinnakerconfig: {}
+    service-settings:
+      clouddriver: {}
+      echo: {}
+      front50: {}
+      gate: {}
+      igor: {}
+      orca: {}
+      rosco: {}
+      spinnaker: {}
+  validation: {}
