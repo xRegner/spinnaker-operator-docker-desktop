@@ -24,7 +24,7 @@ kubectl -n spinnaker-operator apply -f deploy/spinnaker/docker-local/.
 
 ```
 
-* to delete 
+## to delete
 
 ```bash
 kubectl delete -f deploy/crds/

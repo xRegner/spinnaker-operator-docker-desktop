@@ -1,3 +1,4 @@
+### this yaml istall spinnaker OOS in a minimal configuration
 apiVersion: v1
 kind: Service
 metadata:
@@ -76,7 +77,10 @@ metadata:
   name: spinnaker
   namespace: spinnaker-operator
 spec:
-  expose: {}
+  expose:
+    type: service  # Kubernetes LoadBalancer type (service/ingress), note: only "service" is supported for now
+    service:
+      type: LoadBalancer
   kustomize:
     clouddriver: {}
     deck: {}
@@ -95,13 +99,22 @@ spec:
       features: {}
       metricStores: {}
       notifications: {}
-      persistentStorage: {}
+      persistentStorage:
+        persistentStoreType: s3
+        s3:
+          bucket: spinnaker                     # The name of an S3 bucket that Spinnaker will use to save information like applications and pipelines.
+          rootFolder: front50                   # The root folder in the chosen bucket to place all of Spinnaker's persistent data in.
+          #region: us-west-2                     # (Optional).
+          accessKeyId: minio                    # (Optional). Your AWS Access Key ID. If not provided, Operator/Spinnaker will try to find AWS credentials as described at http://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/credentials.html#credentials-default
+          secretAccessKey: encrypted:k8s!n:spin-secrets!k:minioAccessKey # (Secret, Optional). Your AWS Secret Key.
+          pathStyleAccess: true                 # (Optional). When true, use path-style to access bucket; when false, use virtual hosted-style to access bucket.
+          endpoint: http://minio:9000 
       providers: {}
       pubsub: {}
       repository: {}
       security: {}
       spinnaker: {}
-      version: 2.21.0
+      version: 1.26.6
     profiles:
       clouddriver: {}
       echo: {}
