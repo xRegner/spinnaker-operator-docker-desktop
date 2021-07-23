@@ -81,7 +81,6 @@ spec:
     type: service  # Kubernetes LoadBalancer type (service/ingress), note: only "service" is supported for now
     service:
       type: LoadBalancer
-<<<<<<< HEAD:deploy/spinnaker/docker-local/installation.yaml
   kustomize:
     clouddriver: {}
     deck: {}
@@ -91,8 +90,6 @@ spec:
     igor: {}
     orca: {}
     rosco: {}
-=======
->>>>>>> c88860971c95f2b0a2e883c486ea42e54a7030a2:deploy/spinnaker/docker-local/spinnaker-minio.yaml
   spinnakerConfig:
     config:
       artifacts: {}
@@ -105,7 +102,6 @@ spec:
       persistentStorage:
         persistentStoreType: s3
         s3:
-<<<<<<< HEAD:deploy/spinnaker/docker-local/installation.yaml
           bucket: spinnaker                     # The name of an S3 bucket that Spinnaker will use to save information like applications and pipelines.
           rootFolder: front50                   # The root folder in the chosen bucket to place all of Spinnaker's persistent data in.
           #region: us-west-2                     # (Optional).
@@ -113,25 +109,12 @@ spec:
           secretAccessKey: encrypted:k8s!n:spin-secrets!k:minioAccessKey # (Secret, Optional). Your AWS Secret Key.
           pathStyleAccess: true                 # (Optional). When true, use path-style to access bucket; when false, use virtual hosted-style to access bucket.
           endpoint: http://minio:9000 
-=======
-          accessKeyId: minio
-          bucket: spinnaker
-          endpoint: http://minio:9000
-          pathStyleAccess: true
-          region: us-west-2
-          rootFolder: front50
-          secretAccessKey: encrypted:k8s!n:spin-secrets!k:minioAccessKey 
->>>>>>> c88860971c95f2b0a2e883c486ea42e54a7030a2:deploy/spinnaker/docker-local/spinnaker-minio.yaml
       providers: {}
       pubsub: {}
       repository: {}
       security: {}
       spinnaker: {}
-<<<<<<< HEAD:deploy/spinnaker/docker-local/installation.yaml
       version: 1.26.6
-=======
-      version: 1.17.1
->>>>>>> c88860971c95f2b0a2e883c486ea42e54a7030a2:deploy/spinnaker/docker-local/spinnaker-minio.yaml
     profiles:
       clouddriver: {}
       echo: {}
