@@ -83,7 +83,11 @@ spec:
       type: LoadBalancer
   kustomize:
     clouddriver: {}
-    deck: {}
+    deck:
+      # settings-local.js - contents of ~/.hal/default/profiles/settings-local.js
+      # Use the | YAML symbol to indicate a block-style multiline string
+      settings-local.js: |
+        window.spinnakerSettings.feature.kustomizeEnabled = true;
     echo: {}
     front50: {}
     gate: {}
@@ -109,12 +113,32 @@ spec:
           secretAccessKey: encrypted:k8s!n:spin-secrets!k:minioAccessKey # (Secret, Optional). Your AWS Secret Key.
           pathStyleAccess: true                 # (Optional). When true, use path-style to access bucket; when false, use virtual hosted-style to access bucket.
           endpoint: http://minio:9000 
-      providers: {}
+      providers:
+        kubernetes:
+          accounts:
+          - cacheThreads: 1
+            cachingPolicies: []
+            checkPermissionsOnStartup: true
+            customResources: []
+            dockerRegistries: []
+            kinds: []
+            liveManifestCalls: false
+            name: spinnaker
+            namespaces: []
+            oAuthScopes: []
+            omitKinds: []
+            omitNamespaces: []
+            onlySpinnakerManaged: false
+            permissions: {}
+            providerVersion: V2
+            serviceAccount: true
+          enabled: true
+          primaryAccount: spinnaker
       pubsub: {}
       repository: {}
       security: {}
       spinnaker: {}
-      version: 1.26.6
+      version: 1.17.1
     profiles:
       clouddriver: {}
       echo: {}
